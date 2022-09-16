@@ -11,7 +11,6 @@ namespace ContactPro.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-
         }
     }
 }
