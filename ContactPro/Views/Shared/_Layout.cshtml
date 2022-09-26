@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity;
+
+@inject SignInManager<AppUser> SignInManager
+
+<!DOCTYPE html>
 <html lang="en" class="h-100">
 <head>
     <title>@ViewData["Title"] - ContactPro</title>
@@ -40,12 +44,16 @@
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Contacts" asp-action="Index">Contacts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
-                        </li>
+                        @*injecting sign in checks*@
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Contacts" asp-action="Index">Contacts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -71,7 +79,7 @@
                         <img src="/img/ContactPro.png" height="50">
                     </div>
                     <div class="col-12 col-md d-flex justify-content-center justify-content-md-end">
-                        <a href="https://www.linkedin.com/in/andrew-holliday-08454a1ab/" class="socialicons"><i class="bi bi-linkedin p-2 "></i></a>
+                        <a href="https://www.linkedin.com/in/andrew-holliday-08454a1ab/" class="socialicons" target="_blank"><i class="bi bi-linkedin p-2 "></i></a>
                         <a href="#" class="socialicons"><i class="bi bi-twitter p-2"></i></a>
                         <a href="#" class="socialicons"><i class="bi bi-youtube p-2"></i></a>
                         <a href="#" class="socialicons"><i class="bi bi-instagram p-2 "></i></a>
