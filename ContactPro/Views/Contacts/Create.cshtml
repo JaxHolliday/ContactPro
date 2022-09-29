@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>EDIT CONTACT</h1>
+<h1>CREATE CONTACT</h1>
 <div class="p-3 border border-2 shadow-lg bg-light">
     <form asp-action="Create" asp-controller="Contacts" enctype="multipart/form-data">
         <div class="row g-3 p-2">
@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-12 col-lg-4 mt-2">
                         <label asp-for="State" class="control-label"></label>
-                        <select asp-for="State" class="form-control"></select>
+                        <select asp-for="State" class="form-control" asp-items="ViewBag.StatesList"></select>
                         <span asp-validation-for="State" class="text-danger"></span>
                     </div>
                     <div class="col-12 col-lg-2 mt-2">
