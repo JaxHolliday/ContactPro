@@ -11,6 +11,8 @@ using ContactPro.Data;
 using ContactPro.Models;
 using ContactPro.Data.Enums;
 using ContactPro.Services.Interfaces;
+using NuGet.Configuration;
+using System.Xml.Linq;
 
 namespace ContactPro.Controllers
 {
@@ -39,8 +41,26 @@ namespace ContactPro.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Contacts.Include(c => c.Appuser);
-            return View(await applicationDbContext.ToListAsync());
+            //New list created == Explicit declaration
+            var contacts = new List<Contact>();
+            //getting user
+            string appUserId = _userManager.GetUserId(User);
+
+            //return userID and associated contacts / categories
+            AppUser? appUser = _context.Users
+                                      .Include(c => c.Contacts)
+                                      .ThenInclude(c => c.Categories)
+                                      .FirstOrDefault(u => u.Id == appUserId);
+
+            var categories = appUser?.Categories;
+
+            contacts = appUser?.Contacts.OrderBy(c => c.LastName)
+                                       .OrderBy(c => c.FirstName)
+                                       .ToList();
+
+            ViewData["CategoryID"] = new SelectList(categories, "Id", "Name");
+
+            return View(contacts);
         }
 
         [Authorize]
@@ -53,7 +73,7 @@ namespace ContactPro.Controllers
             }
 
             var contact = await _context.Contacts
-                .Include(c => c.Appuser)
+                .Include(c => c.AppUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (contact == null)
             {
@@ -190,7 +210,7 @@ namespace ContactPro.Controllers
             }
 
             var contact = await _context.Contacts
-                .Include(c => c.Appuser)
+                .Include(c => c.AppUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (contact == null)
             {
@@ -214,14 +234,14 @@ namespace ContactPro.Controllers
             {
                 _context.Contacts.Remove(contact);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ContactExists(int id)
         {
-          return _context.Contacts.Any(e => e.Id == id);
+            return _context.Contacts.Any(e => e.Id == id);
         }
     }
 }

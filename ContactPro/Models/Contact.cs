@@ -64,7 +64,7 @@ namespace ContactPro.Models
         public IFormFile? ImageFile { get; set; }
 
         //Virtuals
-        public virtual AppUser? Appuser { get; set; }
+        public virtual AppUser? AppUser { get; set; }
 
         public virtual ICollection<Category> Categories { get; set; } = new HashSet<Category>();   
 

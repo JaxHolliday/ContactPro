@@ -53,7 +53,7 @@ namespace ContactPro.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Name");
             return View();
         }
 
@@ -70,7 +70,7 @@ namespace ContactPro.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", category.AppUserId);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Name", category.AppUserId);
             return View(category);
         }
 
@@ -88,7 +88,7 @@ namespace ContactPro.Controllers
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", category.AppUserId);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Name", category.AppUserId);
             return View(category);
         }
 
@@ -124,7 +124,7 @@ namespace ContactPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", category.AppUserId);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Name", category.AppUserId);
             return View(category);
         }
 
