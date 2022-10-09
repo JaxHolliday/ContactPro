@@ -39,8 +39,10 @@ namespace ContactPro.Controllers
         // GET: Contacts
         //prevents user from typing in directly. making them be logged in 
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int categoryId)
         {
+            //sends categoryId to US
+
             //New list created == Explicit declaration
             var contacts = new List<Contact>();
             //getting user
@@ -54,11 +56,24 @@ namespace ContactPro.Controllers
 
             var categories = appUser?.Categories;
 
+            if (categoryId == 0)
+            {
             contacts = appUser?.Contacts.OrderBy(c => c.LastName)
                                        .OrderBy(c => c.FirstName)
                                        .ToList();
+            }
+            else
+            {
+                //returning contacts in trhis category
+                contacts = appUser?.Categories.FirstOrDefault(c => c.Id == categoryId)
+                                             .Contacts
+                                             .OrderBy(c => c.LastName)
+                                             .ThenBy(c => c.FirstName)
+                                             .ToList();    
+            }
 
-            ViewData["CategoryID"] = new SelectList(categories, "Id", "Name");
+
+            ViewData["CategoryID"] = new SelectList(categories, "Id", "Name", categoryId);
 
             return View(contacts);
         }

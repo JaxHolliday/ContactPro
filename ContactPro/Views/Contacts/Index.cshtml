@@ -26,8 +26,8 @@
         <form asp-action="Index" asp-controller="Contacts">
             <div class="mt-5">
                 <label class="form-label fw-bold">CATEGORY FILTER</label>
-
-                <select name="id" asp-items="@ViewBag.CategoryId" class="form-control"
+                @*postback = process of submitting(FORM) an APS.NET page to the server for processing *@
+                <select name="categoryId" asp-items="@ViewBag.CategoryId" class="form-control"
                         onchange="this.form.submit()" onfocus="this.selectedIndex=-1;this.blur();">
                     <option>All Contacts</option>
                 </select>
