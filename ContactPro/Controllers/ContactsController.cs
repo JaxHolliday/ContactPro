@@ -39,7 +39,7 @@ namespace ContactPro.Controllers
         // GET: Contacts
         //prevents user from typing in directly. making them be logged in 
         [Authorize]
-        public async Task<IActionResult> Index(int categoryId)
+        public IActionResult Index(int categoryId)
         {
             //sends categoryId to US
 
@@ -208,7 +208,7 @@ namespace ContactPro.Controllers
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", contact.AppUserId);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Name", contact.AppUserId);
             return View(contact);
         }
 
@@ -244,7 +244,7 @@ namespace ContactPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", contact.AppUserId);
+            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Name", contact.AppUserId);
             return View(contact);
         }
 

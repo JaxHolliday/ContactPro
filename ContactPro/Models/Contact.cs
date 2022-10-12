@@ -60,6 +60,7 @@ namespace ContactPro.Models
 
         public string? ImageType { get; set; }
 
+        //collects our upload
         [NotMapped]
         public IFormFile? ImageFile { get; set; }
 
