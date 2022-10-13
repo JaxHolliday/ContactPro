@@ -64,7 +64,7 @@ namespace ContactPro.Controllers
             }
             else
             {
-                //returning contacts in trhis category
+                //returning contacts in this category
                 contacts = appUser?.Categories.FirstOrDefault(c => c.Id == categoryId)
                                              .Contacts
                                              .OrderBy(c => c.LastName)
@@ -186,8 +186,6 @@ namespace ContactPro.Controllers
                 //save each category to the contact categories table.
 
 
-
-
                 return RedirectToAction(nameof(Index));
             }
 
@@ -203,12 +201,18 @@ namespace ContactPro.Controllers
                 return NotFound();
             }
 
-            var contact = await _context.Contacts.FindAsync(id);
+            string appUserId = _userManager.GetUserId(User);
+
+            //var contact = await _context.Contacts.FindAsync(id);
+            var contact = await _context.Contacts.Where(c => c.Id == id && c.AppUserId == appUserId)
+                                                 .FirstOrDefaultAsync(); 
+
             if (contact == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Name", contact.AppUserId);
+
+            ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
             return View(contact);
         }
 
