@@ -132,7 +132,7 @@ namespace ContactPro.Controllers
                 LastName = contact.LastName
             };
 
-            EmailContactViewModel model = new EmailContactViewModel();
+            EmailContactViewModel model = new EmailContactViewModel()
             {
                 Contact = contact,
                 EmailData = emailData
