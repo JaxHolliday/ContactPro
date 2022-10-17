@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using ContactPro.Data;
 using ContactPro.Models;
+using ContactPro.Models.ViewModels;
 using ContactPro.Data.Enums;
 using ContactPro.Services.Interfaces;
 using NuGet.Configuration;
@@ -112,9 +113,32 @@ namespace ContactPro.Controllers
         }
 
         [Authorize]
-        public IActionResult EmailContact(int contactId) 
+        public async Task<IActionResult> EmailContact(int Id) 
         {
-            return View();
+            string appUserId = _userManager.GetUserId(User);
+            Contact contact = await _context.Contacts.Where(c => c.Id == Id && c.AppUserId == appUserId)
+                                                     .FirstOrDefaultAsync();
+            //Returns 404 page if null
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            //new instance of email data
+            EmailData emailData = new EmailData()
+            {
+                EmailAddress = contact.Email,
+                FirstName = contact.FirstName,
+                LastName = contact.LastName
+            };
+
+            EmailContactViewModel model = new EmailContactViewModel();
+            {
+                Contact = contact,
+                EmailData = emailData
+            };
+
+            return View(model);
         }
 
         [Authorize]
