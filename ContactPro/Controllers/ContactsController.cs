@@ -14,6 +14,8 @@ using ContactPro.Data.Enums;
 using ContactPro.Services.Interfaces;
 using NuGet.Configuration;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ContactPro.Controllers
 {
@@ -24,26 +26,29 @@ namespace ContactPro.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IImageService _imageService;
         private readonly IAddressBookService _addressBookService;
+        private readonly IEmailSender _emailService;
 
         //inject objects to access there properties 
         public ContactsController(ApplicationDbContext context,
                                   UserManager<AppUser> userManager,
                                   IImageService imageService,
-                                  IAddressBookService addressBookService)
+                                  IAddressBookService addressBookService,
+                                  IEmailSender emailService)
         {
             _context = context;
             _userManager = userManager;
             _imageService = imageService;
             _addressBookService = addressBookService;
+            _emailService = emailService;
         }
 
         // GET: Contacts
         //prevents user from typing in directly. making them be logged in 
         [Authorize]
-        public IActionResult Index(int categoryId)
+        public IActionResult Index(int categoryId, string swalMessage = null)
         {
+            ViewData["SwalMessage"] = swalMessage;
             //sends categoryId to US
-
             //New list created == Explicit declaration
             var contacts = new List<Contact>();
             //getting user
@@ -116,7 +121,7 @@ namespace ContactPro.Controllers
         public async Task<IActionResult> EmailContact(int Id) 
         {
             string appUserId = _userManager.GetUserId(User);
-            Contact contact = await _context.Contacts.Where(c => c.Id == Id && c.AppUserId == appUserId)
+            Contact? contact = await _context.Contacts.Where(c => c.Id == Id && c.AppUserId == appUserId)
                                                      .FirstOrDefaultAsync();
             //Returns 404 page if null
             if (contact == null)
@@ -139,6 +144,29 @@ namespace ContactPro.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> EmailContact(EmailContactViewModel ecvm)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //send email => getting the address,subject and body
+                    await _emailService.SendEmailAsync(ecvm.EmailData.EmailAddress, ecvm.EmailData.Subject, ecvm.EmailData.Body);
+                    return RedirectToAction("Index", "Contacts", new {swalMessage = "Success: Email Sent!"});
+                }
+                catch (Exception)
+                {
+                    //if anything w/ email has changed or etc
+                    return RedirectToAction("Index", "Contacts", new { swalMessage = "Error: Email Send Failed!" });
+                    throw;
+                }
+            }
+            return View(ecvm);
+
         }
 
         [Authorize]
