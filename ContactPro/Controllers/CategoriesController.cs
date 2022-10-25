@@ -87,17 +87,23 @@ namespace ContactPro.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
+            string appUserId = _userManager.GetUserId(User);
+
+            //checks item and app user to make sure it is not bogus
+            var category = await _context.Categories.Where(c => c.Id == id && c.AppUserId == appUserId)
+                                                     .FirstOrDefaultAsync();
+
+
             if (category == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "FullName", category.AppUserId);
+
             return View(category);
         }
 
