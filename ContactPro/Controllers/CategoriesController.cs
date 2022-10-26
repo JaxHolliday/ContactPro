@@ -108,8 +108,6 @@ namespace ContactPro.Controllers
         }
 
         // POST: Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,Name")] Category category)
@@ -123,6 +121,10 @@ namespace ContactPro.Controllers
             {
                 try
                 {
+                    //make user userid belongs to logged in user 
+                    //then reset category to app user
+                    string appUserId = _userManager.GetUserId(User);
+                    category.AppUserId = appUserId; 
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
@@ -139,7 +141,7 @@ namespace ContactPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "FullName", category.AppUserId);
+
             return View(category);
         }
 
