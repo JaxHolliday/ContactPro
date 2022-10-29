@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using ContactPro.Data;
 using ContactPro.Models;
 using ContactPro.Models.ViewModels;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using ContactPro.Services;
 
 namespace ContactPro.Controllers
 {
@@ -17,17 +19,23 @@ namespace ContactPro.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IEmailSender _emailService;
 
-        public CategoriesController(ApplicationDbContext context, UserManager<AppUser> userManager)
+        public CategoriesController(ApplicationDbContext context,
+                                    UserManager<AppUser> userManager,
+                                    IEmailSender emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         // GET: Categories
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string swalMessage = null)
         {
+            ViewData["SwalMessage"] = swalMessage;
+
             //finding logged in user and showing only categories of the logged in user
             string appUserId = _userManager.GetUserId(User);
 
@@ -68,6 +76,29 @@ namespace ContactPro.Controllers
             return View(model);
         }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> EmailCategory(EmailCategoryViewModel ecvm)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _emailService.SendEmailAsync(ecvm.EmailData.EmailAddress, ecvm.EmailData.Subject, ecvm.EmailData.Body);
+                    return RedirectToAction("Index", "Categories", new { swalMessage = "Success: Email Sent!" });
+                }
+                catch (Exception)
+                {
+                    //if anything w/ email has changed or etc
+                    return RedirectToAction("Index", "Contacts", new { swalMessage = "Error: Email Send Failed!" });
+                    throw;
+                }
+            }
+
+            return View(ecvm);
+
+        }
+
         // GET: Categories/Details/5
         [Authorize]
         public async Task<IActionResult> Details(int? id)
@@ -102,7 +133,7 @@ namespace ContactPro.Controllers
         {
             //remove from model then add before we save it 
             ModelState.Remove("AppUserId");
-            
+
             if (ModelState.IsValid)
             {
                 string appUserId = _userManager.GetUserId(User);
@@ -156,7 +187,7 @@ namespace ContactPro.Controllers
                     //make user userid belongs to logged in user 
                     //then reset category to app user
                     string appUserId = _userManager.GetUserId(User);
-                    category.AppUserId = appUserId; 
+                    category.AppUserId = appUserId;
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
@@ -211,14 +242,14 @@ namespace ContactPro.Controllers
             {
                 _context.Categories.Remove(category);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CategoryExists(int id)
         {
-          return _context.Categories.Any(e => e.Id == id);
+            return _context.Categories.Any(e => e.Id == id);
         }
     }
 }
