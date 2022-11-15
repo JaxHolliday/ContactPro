@@ -46,10 +46,10 @@ namespace ContactPro.Services
 
             try
             {
-                var host = _mailSettings.Host ?? Environment.GetEnvironmentVariable("Host");
+                var host = _mailSettings.MailHost ?? Environment.GetEnvironmentVariable("MailHost");
                 //if not = 0 look local else look into the environment and turn into int
-                var port = _mailSettings.Port != 0 ? _mailSettings.Port : int.Parse(Environment.GetEnvironmentVariable("Port"));
-                var password = _mailSettings.Password ?? Environment.GetEnvironmentVariable("Password");
+                var port = _mailSettings.MailPort != 0 ? _mailSettings.MailPort : int.Parse(Environment.GetEnvironmentVariable("Port"));
+                var password = _mailSettings.MailPassword ?? Environment.GetEnvironmentVariable("MailPassword");
 
                 await smtpClient.ConnectAsync(host, port, SecureSocketOptions.StartTls);
                 await smtpClient.AuthenticateAsync(emailSender, password);
